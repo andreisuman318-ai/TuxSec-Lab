@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberLinux Hub - OS, Cybersecurity & Hacking Interactive Guide</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            matrix: '#00ff66',
+            cyberDark: '#070b12',
+            cardBg: 'rgba(15, 23, 42, 0.75)',
+            kaliBlue: '#1f385c',
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'monospace'],
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070b12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #00ff66;
+      border-radius: 4px;
+    }
+
+    /* Glassmorphism card styles */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 255, 102, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(0, 255, 102, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0, 255, 102, 0.15);
+    }
+
+    /* Floating Animals Styling */
+    .floating-pet {
+      position: fixed;
+      font-size: 2.2rem;
+      cursor: pointer;
+      user-select: none;
+      z-index: 40;
+      filter: drop-shadow(0 0 8px rgba(0,255,102,0.4));
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: floatMotion 8s ease-in-out infinite alternate;
+    }
+    .floating-pet:hover {
+      transform: scale(1.5) rotate(15deg);
+    }
+
+    @keyframes floatMotion {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(30px, -40px) rotate(10deg); }
+      50% { transform: translate(-20px, -80px) rotate(-10deg); }
+      75% { transform: translate(-40px, -30px) rotate(5deg); }
+      100% { transform: translate(10px, 0px) rotate(0deg); }
+    }
+
+    /* Matrix canvas overlay */
+    #matrixCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.22;
+    }
+
+    /* Terminal Glow */
+    .terminal-box {
+      box-shadow: 0 0 20px rgba(0, 255, 102, 0.15);
+    }
+  </style>
+</head>
+<body class="bg-cyberDark text-slate-100 font-sans min-h-screen relative overflow-x-hidden selection:bg-matrix selection:text-black">
+
+  <!-- Matrix Digital Rain Canvas -->
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- Floating Animals (Penguins, Cats, Chickens, Ducks) -->
+  <div id="pet-penguin-1" class="floating-pet" style="top: 15%; left: 5%; animation-delay: 0s;" onclick="petTalk('🐧 Tux: Linux este cel mai tare OS! Vroom vroom!')">🐧</div>
+  <div id="pet-cat-1" class="floating-pet" style="top: 25%; right: 8%; animation-delay: 2s;" onclick="petTalk('🐱 Miau! Am găsit o vulnerabilitate în bolul de lapte!')">🐱</div>
+  <div id="pet-duck-1" class="floating-pet" style="top: 65%; left: 8%; animation-delay: 4s;" onclick="petTalk('🦆 Mac mac! Folosește Tor Browser pentru anonimitate!')">🦆</div>
+  <div id="pet-chicken-1" class="floating-pet" style="top: 75%; right: 12%; animation-delay: 1s;" onclick="petTalk('🐔 Cotcodac! Am scris cod C fără bug-uri!')">🐔</div>
+  <div id="pet-penguin-2" class="floating-pet" style="top: 85%; left: 45%; animation-delay: 3s;" onclick="petTalk('🐧 Kali Linux are sute de instrumente de hacking!')">🐧</div>
+
+  <!-- Pet Toast Speech Popup -->
+  <div id="petSpeech" class="fixed bottom-6 right-6 bg-slate-900 border-2 border-matrix text-matrix px-5 py-3 rounded-xl shadow-2xl font-mono text-sm z-50 hidden transform transition-all duration-300">
+    <span id="petSpeechText"></span>
+  </div>
+
+  <!-- Main Container -->
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Top Navigation Header -->
+    <header class="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 border-b border-slate-800 pb-6">
+      <div class="flex items-center space-x-3">
+        <span class="text-4xl animate-bounce">🐧</span>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
+            CyberLinux <span class="text-matrix font-mono text-lg font-normal px-2 py-0.5 rounded bg-matrix/10 border border-matrix/30">v3.0 🚀</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-400">Platformă Interactivă: OS, Cybersecurity, Ethical Hacking & Privacy 🐱🦆🐔</p>
+        </div>
+      </div>
+
+      <!-- OS Switcher Tabs Bar -->
+      <div class="flex items-center bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+        <button onclick="switchOS('linux')" id="os-btn-linux" class="os-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-matrix text-slate-950 shadow-lg">
+          <i class="fa-brands fa-linux text-base"></i> Linux
+        </button>
+        <button onclick="switchOS('windows')" id="os-btn-windows" class="os-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white">
+          <i class="fa-brands fa-windows text-base"></i> Windows
+        </button>
+        <button onclick="switchOS('macos')" id="os-btn-macos" class="os-tab-btn flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white">
+          <i class="fa-brands fa-apple text-base"></i> macOS
+        </button>
+      </div>
+    </header>
+
+    <!-- OS Info Dynamic Banner -->
+    <div id="osBanner" class="mb-10 p-6 rounded-2xl glass-card relative overflow-hidden">
+      <!-- Dynamic content rendered by JS -->
+    </div>
+
+    <!-- Interactive Terminal Section -->
+    <section class="mb-12">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 font-mono">
+          <i class="fa-solid fa-terminal text-matrix"></i> Terminal Linux Interactiv 🐱
+        </h2>
+        <span class="text-xs font-mono text-slate-400">Tastează <code class="text-matrix">help</code> pentru comenzi</span>
+      </div>
+
+      <div class="terminal-box bg-slate-950 border border-matrix/40 rounded-2xl overflow-hidden font-mono text-sm shadow-2xl">
+        <!-- Terminal Header Bar -->
+        <div class="bg-slate-900 px-4 py-3 flex items-center justify-between border-b border-slate-800">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+            <span class="ml-2 text-xs text-slate-400 font-semibold">root@cyber-hub:~ (bash)</span>
+          </div>
+          <div class="text-xs text-slate-500 flex items-center gap-3">
+            <span>Encrypted 🔒</span>
+            <span>UTF-8</span>
+          </div>
+        </div>
+
+        <!-- Terminal Output Area -->
+        <div id="terminalOutput" class="p-4 h-64 overflow-y-auto space-y-2 text-slate-300">
+          <p class="text-matrix">=== CyberLinux Shell v3.0 [System Ready] ===</p>
+          <p class="text-slate-400">Bine ai venit în terminal! Tastează <span class="text-matrix font-bold">help</span> pentru a vedea lista completă de comenzi interactive (distros, hacking, tor, cyber, cat, duck, quiz, system etc.). 🐧🐱</p>
+        </div>
+
+        <!-- Terminal Input Line -->
+        <form id="terminalForm" onsubmit="handleTerminalSubmit(event)" class="flex items-center bg-slate-900/60 px-4 py-3 border-t border-slate-800/80">
+          <span class="text-matrix font-bold mr-2">root@cyberlinux:~#</span>
+          <input type="text" id="terminalInput" autocomplete="off" class="w-full bg-transparent text-slate-100 focus:outline-none font-mono text-sm" placeholder="scrie comanda aici... (ex: help)">
+          <button type="submit" class="text-matrix hover:text-white px-3 py-1 text-xs bg-matrix/20 rounded-lg border border-matrix/40 transition">Execută</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Detailed Educational Content Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+
+      <!-- Card 1: Istoria Linux & Linus Torvalds -->
+      <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl mb-4">
+            🐧
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Istoria Linux & Linus Torvalds</h3>
+          <p class="text-slate-300 text-sm mb-4">
+            În **1991**, Linus Torvalds (student finlandez) a creat Kernelul Linux ca un proiect personal. A fost scris în **Limbajul C** și asamblare, devenind cel mai de succes proiect Open-Source din lume!
+          </p>
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1 font-mono">
+            <p>👨‍💻 Creator: Linus Torvalds</p>
+            <p>💻 Limbaj: C & Assembly</p>
+            <p>📜 Licență: GNU GPL v2</p>
+            <p>🤖 Mascotă: Tux Pinguinul 🐧</p>
+          </div>
+        </div>
+        <button onclick="petTalk('🐧 Linus Torvalds a creat Linux în 1991! Codul sursă este complet gratuit!')" class="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs text-amber-300 rounded-xl transition border border-slate-700">
+          Află mai multe despre Linux 🐧
+        </button>
+      </div>
+
+      <!-- Card 2: Cybersecurity & Ethical Hacking -->
+      <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 text-2xl mb-4">
+            🛡️
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Cybersecurity & Ethical Hacking</h3>
+          <p class="text-slate-300 text-sm mb-4">
+            **Hacking-ul Etic** (White Hat) presupune testarea de securitate a sistemelor pentru a găsi și repara vulnerabilitățile înainte de a fi exploatate de hackeri rău intenționați (Black Hat).
+          </p>
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1 font-mono">
+            <p>🎯 Penetration Testing (PenTest)</p>
+            <p>🔓 Vuln Analysis & Exploitation</p>
+            <p>🐉 Unelte: Metasploit, Nmap, Wireshark</p>
+            <p>🐱 Pisicile detectează intrușii!</p>
+          </div>
+        </div>
+        <button onclick="petTalk('🐱 Hacking-ul etic ajută companiile să se protejeze de atacuri cibernetice!')" class="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs text-red-300 rounded-xl transition border border-slate-700">
+          Explorează Hacking Etic 🐱
+        </button>
+      </div>
+
+      <!-- Card 3: Tor Browser & Dark Web Privacy -->
+      <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-2xl mb-4">
+            🧅
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Tor Browser & Anonimitate</h3>
+          <p class="text-slate-300 text-sm mb-4">
+            **Tor (The Onion Router)** direcționează traficul web prin noduri criptate multiple în formă de foi de ceapă. Protejează identitatea împotriva supravegherii și blochează urmărirea.
+          </p>
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1 font-mono">
+            <p>🧅 Criptare Multi-Strat (Onion Routing)</p>
+            <p>🌐 Acces domenii `.onion`</p>
+            <p>🦆 Rățușca recomandă protecția datelor!</p>
+          </div>
+        </div>
+        <button onclick="petTalk('🦆 Tor Browser folosește 3 noduri de criptare pentru a-ți ascunde adresa IP!')" class="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs text-purple-300 rounded-xl transition border border-slate-700">
+          Descoperă Protecția Tor 🦆
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Distros Showcase Section -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+        <i class="fa-solid fa-layer-group text-matrix"></i> Distribuții Linux Principale (Distros) 🐔
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <!-- Ubuntu -->
+        <div class="glass-card p-5 rounded-xl border-t-4 border-orange-500">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-white text-lg">Ubuntu</h4>
+            <span class="text-2xl">🟠</span>
+          </div>
+          <p class="text-slate-300 text-xs mb-3">Cea mai populară distribuție pentru începători. Prietenoasă și bazată pe Debian.</p>
+          <span class="inline-block bg-orange-500/20 text-orange-300 text-[10px] px-2 py-0.5 rounded font-mono">Prietenos cu Începătorii</span>
+        </div>
+
+        <!-- Kali Linux -->
+        <div class="glass-card p-5 rounded-xl border-t-4 border-blue-500">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-white text-lg">Kali Linux</h4>
+            <span class="text-2xl">🐉</span>
+          </div>
+          <p class="text-slate-300 text-xs mb-3">Sistemul de operare standard pentru testarea securității cibernetice și hacking etic.</p>
+          <span class="inline-block bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded font-mono">Securitate & PenTesting</span>
+        </div>
+
+        <!-- Arch Linux -->
+        <div class="glass-card p-5 rounded-xl border-t-4 border-cyan-400">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-white text-lg">Arch Linux</h4>
+            <span class="text-2xl">🏔️</span>
+          </div>
+          <p class="text-slate-300 text-xs mb-3">Distribuție minimalista "KISS". O construiești de la zero exact cum dorești.</p>
+          <span class="inline-block bg-cyan-400/20 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-mono">Avansați & Control</span>
+        </div>
+
+        <!-- Debian -->
+        <div class="glass-card p-5 rounded-xl border-t-4 border-red-500">
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="font-bold text-white text-lg">Debian</h4>
+            <span class="text-2xl">🌀</span>
+          </div>
+          <p class="text-slate-300 text-xs mb-3">Bunicul multor distribuții. Ultra-stabil, excelent pentru servere de rețea.</p>
+          <span class="inline-block bg-red-500/20 text-red-300 text-[10px] px-2 py-0.5 rounded font-mono">Stabilitate & Server</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cyber & Linux Mini-Quiz Widget -->
+    <section class="glass-card p-6 sm:p-8 rounded-2xl mb-12 border-matrix/30">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <span class="text-xs font-mono text-matrix uppercase tracking-wider font-bold">Test de Cunoștințe</span>
+          <h3 class="text-2xl font-extrabold text-white mt-1">Quiz Interactiv Cyber & Linux 🎯</h3>
+          <p class="text-slate-300 text-sm mt-1">Testează-ți cunoștințele despre Linux, securitate cibernetică și hackeri!</p>
+        </div>
+        <div class="text-right">
+          <span id="quizScoreDisplay" class="text-2xl font-mono font-bold text-matrix">Scor: 0 / 0</span>
+        </div>
+      </div>
+
+      <hr class="my-6 border-slate-800">
+
+      <div id="quizContainer" class="space-y-4">
+        <!-- Quiz questions generated dynamically -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-slate-500 text-xs py-6 border-t border-slate-900 flex flex-col items-center gap-2">
+      <div class="flex items-center gap-3 text-lg">
+        <span>🐧</span> <span>🐱</span> <span>🐔</span> <span>🦆</span>
+      </div>
+      <p>Proiectat pentru învățare interactivă: Linux, Cybersecurity & Operating Systems.</p>
+      <p class="font-mono text-[10px] text-slate-600">Open-Source Spirit • Linux Kernel • C Language</p>
+    </footer>
+
+  </div>
+
+  <script>
+    /* -------------------------------------------------------------
+       1. MATRIX RAIN CANVAS ANIMATION
+    ------------------------------------------------------------- */
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const matrixChars = '01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzλπµ🐧🐱🦆🐔';
+    const fontSize = 14;
+    let columns = Math.floor(canvas.width / fontSize);
+    let drops = Array(columns).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(7, 11, 18, 0.08)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00ff66';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = matrixChars.charAt(Math.floor(Math.random() * matrixChars.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 40);
+
+    /* -------------------------------------------------------------
+       2. EMOJI PET TALK SPEECH POPUP
+    ------------------------------------------------------------- */
+    function petTalk(message) {
+      const popup = document.getElementById('petSpeech');
+      const text = document.getElementById('petSpeechText');
+      text.innerText = message;
+      popup.classList.remove('hidden');
+
+      setTimeout(() => {
+        popup.classList.add('hidden');
+      }, 4000);
+    }
+
+    /* -------------------------------------------------------------
+       3. OS SWITCHER DATA & LOGIC
+    ------------------------------------------------------------- */
+    const osData = {
+      linux: {
+        title: "Linux Operating System 🐧",
+        color: "text-matrix",
+        border: "border-matrix/40",
+        desc: "Kernel Open-Source creat de Linus Torvalds în 1991 în limbajul C. Este inima supercomputerelor, serverelor de internet, dispozitivelor Android și distru-urilor de hacking precum Kali Linux!",
+        highlights: ["Open Source & Gratuit", "Scris în Limbajul C", "Performanță & Securitate Maximă", "Flexibilitate Totală (Kernel Custom)"]
+      },
+      windows: {
+        title: "Microsoft Windows 🪟",
+        color: "text-blue-400",
+        border: "border-blue-500/40",
+        desc: "Cel mai utilizat sistem de operare pentru calculatoare personale și jocuri video. Dezvoltat de Microsoft, folosește Kernel-ul Windows NT.",
+        highlights: ["Dominant pe Desktop & Gaming", "Ecosistem vast de software", "PowerShell & WSL (Windows Subsystem for Linux)"]
+      },
+      macos: {
+        title: "Apple macOS 🍎",
+        color: "text-purple-400",
+        border: "border-purple-500/40",
+        desc: "Sistemul de operare Apple pentru Mac-uri, bazat pe UNIX (Darwin core). Combină stabilitatea UNIX cu o interfață grafică elegantă.",
+        highlights: ["Core-ul bazat pe UNIX", "Optimizat pentru creatori și developeri", "Integrare strânsă cu hardware-ul Apple"]
+      }
+    };
+
+    function switchOS(osKey) {
+      // Update Tab Styles
+      document.querySelectorAll('.os-tab-btn').forEach(btn => {
+        btn.classList.remove('bg-matrix', 'text-slate-950', 'shadow-lg');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeBtn = document.getElementById(`os-btn-${osKey}`);
+      activeBtn.classList.add('bg-matrix', 'text-slate-950', 'shadow-lg');
+      activeBtn.classList.remove('text-slate-400');
+
+      // Update Banner Content
+      const data = osData[osKey];
+      const banner = document.getElementById('osBanner');
+      banner.className = `mb-10 p-6 rounded-2xl glass-card relative overflow-hidden border ${data.border}`;
+
+      banner.innerHTML = `
+        <h3 class="text-2xl font-bold ${data.color} mb-2">${data.title}</h3>
+        <p class="text-slate-300 text-sm mb-4 leading-relaxed">${data.desc}</p>
+        <div class="flex flex-wrap gap-2">
+          ${data.highlights.map(item => `<span class="bg-slate-900/80 text-xs text-slate-200 px-3 py-1 rounded-lg border border-slate-700">✓ ${item}</span>`).join('')}
+        </div>
+      `;
+    }
+    // Initialize OS switcher with Linux
+    switchOS('linux');
+
+    /* -------------------------------------------------------------
+       4. INTERACTIVE TERMINAL LOGIC
+    ------------------------------------------------------------- */
+    const terminalOutput = document.getElementById('terminalOutput');
+
+    function appendTerminalLine(text, type = 'output') {
+      const p = document.createElement('p');
+      if (type === 'cmd') {
+        p.className = 'text-slate-200 font-bold';
+        p.innerHTML = `<span class="text-matrix">root@cyberlinux:~#</span> ${text}`;
+      } else if (type === 'error') {
+        p.className = 'text-red-400';
+        p.innerText = text;
+      } else {
+        p.className = 'text-slate-300';
+        p.innerHTML = text;
+      }
+      terminalOutput.appendChild(p);
+      terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }
+
+    function handleTerminalSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('terminalInput');
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+
+      appendTerminalLine(cmd, 'cmd');
+      input.value = '';
+
+      switch (cmd) {
+        case 'help':
+          appendTerminalLine(`
+            <span class="text-matrix font-bold">Comenzi disponibile în Terminal:</span><br>
+            • <b class="text-amber-300">whoami</b> : Afișează utilizatorul curent<br>
+            • <b class="text-amber-300">distros</b> : Listează distribuțiile de top Linux<br>
+            • <b class="text-amber-300">hacking</b> : Ce înseamnă Ethical Hacking?<br>
+            • <b class="text-amber-300">tor</b> : Informații despre Tor Browser & Privacy<br>
+            • <b class="text-amber-300">cyber</b> : Sfaturi de Securitate Cibernetică<br>
+            • <b class="text-amber-300">cat</b> / <b class="text-amber-300">duck</b> / <b class="text-amber-300">chicken</b> : Mascotele noastre 🐱🦆🐔<br>
+            • <b class="text-amber-300">matrix</b> : Activează un mesaj special Matrix<br>
+            • <b class="text-amber-300">system</b> : Detalii despre Kernel & Limbajul C<br>
+            • <b class="text-amber-300">clear</b> : Curăță ecranul terminalului
+          `);
+          break;
+
+        case 'whoami':
+          appendTerminalLine('root_admin (Ethical Hacker & Linux Explorer) 🐧');
+          break;
+
+        case 'distros':
+          appendTerminalLine('Distribuții recomandate: Kali Linux (Hacking), Ubuntu (Începători), Arch Linux (Avansați), Debian (Servere).');
+          break;
+
+        case 'hacking':
+          appendTerminalLine('Hacking-ul etic (White Hat) protejează rețelele testând vulnerabilități prin teste de penetrare autorizate!');
+          break;
+
+        case 'tor':
+          appendTerminalLine('Tor Browser criptează datele în 3 straturi (Onion Routing) și îți maschează adresa IP pe internet.');
+          break;
+
+        case 'cyber':
+          appendTerminalLine('Sfat Cyber: Folosește parole unice complexe, autentificare în 2 pași (2FA) și actualizează mereu sistemul!');
+          break;
+
+        case 'cat':
+          appendTerminalLine('🐱 Miau! Pisica a scanat porturile de rețea cu Nmap!');
+          break;
+
+        case 'duck':
+          appendTerminalLine('🦆 Mac mac! Rățușca protejează conexiunea ta criptată!');
+          break;
+
+        case 'chicken':
+          appendTerminalLine('🐔 Cotcodac! Codul C din kernel a fost compilat cu succes!');
+          break;
+
+        case 'matrix':
+          appendTerminalLine('<span class="text-matrix font-bold">"You take the blue pill, the story ends. You take the red pill, you stay in Wonderland and I show you how deep the rabbit hole goes." 🔴🔵</span>');
+          break;
+
+        case 'system':
+          appendTerminalLine('Kernel: Linux 6.x | Limbaj: C & Assembly | Arhitectură: x86_64 / ARM64 | Open Source: DA');
+          break;
+
+        case 'clear':
+          terminalOutput.innerHTML = '';
+          break;
+
+        default:
+          appendTerminalLine(`Comandă necunoscută: "${cmd}". Tastează 'help' pentru instrucțiuni.`, 'error');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       5. INTERACTIVE QUIZ LOGIC
+    ------------------------------------------------------------- */
+    const quizData = [
+      {
+        question: "Cine este creatorul principal al Kernel-ului Linux?",
+        options: ["Bill Gates", "Linus Torvalds", "Steve Jobs", "Mark Zuckerberg"],
+        correct: 1
+      },
+      {
+        question: "În ce limbaj de programare este scris în principal Kernel-ul Linux?",
+        options: ["Python", "JavaScript", "Limbajul C", "Java"],
+        correct: 2
+      },
+      {
+        question: "Ce distribuție Linux este specializată în Hacking Etic și Securitate?",
+        options: ["Kali Linux", "Ubuntu", "Fedora", "Linux Mint"],
+        correct: 0
+      },
+      {
+        question: "Ce tehnologie folosește Tor Browser pentru anonimitate?",
+        options: ["Onion Routing (Criptare în straturi)", "Cookie-uri simple", "Direct IP Connect", "Bluetooth"],
+        correct: 0
+      }
+    ];
+
+    let userScore = 0;
+    let answeredCount = 0;
+
+    function renderQuiz() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = quizData.map((q, idx) => `
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+          <p class="font-semibold text-sm text-white mb-3">${idx + 1}. ${q.question}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="q-options-${idx}">
+            ${q.options.map((opt, optIdx) => `
+              <button onclick="checkAnswer(${idx}, ${optIdx})" class="text-left px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 transition border border-slate-700">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function checkAnswer(qIdx, selectedOpt) {
+      const q = quizData[qIdx];
+      const optionsContainer = document.getElementById(`q-options-${qIdx}`);
+      const buttons = optionsContainer.querySelectorAll('button');
+
+      // Disable buttons for this question
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.correct) {
+          btn.classList.remove('bg-slate-800', 'border-slate-700');
+          btn.classList.add('bg-green-600', 'text-white', 'border-green-400');
+        } else if (idx === selectedOpt) {
+          btn.classList.remove('bg-slate-800', 'border-slate-700');
+          btn.classList.add('bg-red-600', 'text-white', 'border-red-400');
+        }
+      });
+
+      if (selectedOpt === q.correct) {
+        userScore++;
+        petTalk('🎉 Corect! Ai obținut un punct!');
+      } else {
+        petTalk('❌ Incorect! Încearcă să citești secțiunile de mai sus.');
+      }
+
+      answeredCount++;
+      document.getElementById('quizScoreDisplay').innerText = `Scor: ${userScore} / ${quizData.length}`;
+    }
+
+    // Render initial quiz
+    renderQuiz();
+  </script>
+</body>
+</html>
